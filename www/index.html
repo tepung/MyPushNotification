@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <script src="components/loader.js"></script>
+    <script src="lib/angular/angular.min.js"></script>
+    <script src="lib/onsenui/js/onsenui.min.js"></script>
+    <script src="lib/onsenui/js/angular-onsenui.min.js"></script>
+    
+    <link rel="stylesheet" href="components/loader.css">
+    <link rel="stylesheet" href="lib/onsenui/css/onsenui.css">
+    <link rel="stylesheet" href="lib/onsenui/css/onsen-css-components.css">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <script>
+    ons.bootstrap()
+    .controller('AppController', function($scope) {
+        $scope.data ="NONE";
+        
+        document.addEventListener("deviceready", onDeviceReady, false);
+        
+        function onDeviceReady() {
+            console.log("deviceready");
+            var notificationOpenedCallback = function(jsonData) {
+                console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+                var tmp_data = JSON.stringify(jsonData.notification.payload.additionalData);
+                $scope.data = tmp_data;
+                window.myTabbar.setActiveTab(1);
+            };
+        
+            window.plugins.OneSignal
+                .startInit("da652e49-fb0b-4a82-96b3-f81e8e856178")
+                .handleNotificationOpened(notificationOpenedCallback)
+                .endInit();
+        }
+    });
+    
+    ons.ready(function() {
+        console.log("Onsen UI is ready!");
+    });
+  </script>
+</head>
+<body>
+    <ons-page ng-controller="AppController as app">
+        <ons-toolbar>
+            <div class="center">Push Demo</div>
+        </ons-toolbar>
+        
+        <ons-tabbar id="myTabbar" position="bottom">
+            <ons-tab page="page1.html" label="Page 1" icon="square" active></ons-tab>
+            <ons-tab page="page2.html" label="Page 2" icon="square"></ons-tab>
+        </ons-tabbar>
+    </ons-page>
+    
+    <template id="page1.html">
+        <ons-page ons-show="app.title = 'Page 1'">
+            <div class="content" style="text-align: center">
+                <p>Page 1 content</p>
+            </div>
+        </ons-page>
+    </template>
+    
+    <template id="page2.html">
+        <ons-page ons-show="app.title = 'Page 2'">
+            <div class="content" style="text-align: center">
+                <p>Page 2 content</p>
+                <p>Data from push notification:</p>
+                <b>{{data}}</b>
+            </div>
+        </ons-page>
+    </template>
+</body>
+</html>
